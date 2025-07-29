@@ -1,3 +1,171 @@
+/* --- Modern Cows and Bulls Game Styles --- */
+.cb-modern-bg {
+  min-height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, #e0e7ff 0%, #f0fdfa 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+}
+.cb-modern-container {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px 0 rgba(16,30,54,0.13);
+  padding: 2.5rem 2.2rem 2rem 2.2rem;
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+}
+.cb-modern-title {
+  font-family: 'Orbitron', 'Inter', Arial, Helvetica, sans-serif;
+  font-size: 2.3rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #2563eb;
+  margin-bottom: 0.2rem;
+  text-shadow: 0 2px 8px #e0e7ff;
+}
+.cb-modern-desc {
+  font-size: 1.08rem;
+  color: #334155;
+  margin-bottom: 0.7rem;
+  text-align: center;
+  line-height: 1.6;
+}
+.cb-modern-form {
+  display: flex;
+  gap: 0.7rem;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  justify-content: center;
+}
+.cb-modern-input {
+  width: 120px;
+  padding: 0.6rem 0.7rem;
+  font-size: 1.2rem;
+  border: 2px solid #a5b4fc;
+  border-radius: 7px;
+  text-align: center;
+  outline: none;
+  background: #f8fafc;
+  font-family: 'Orbitron', 'Inter', Arial, Helvetica, sans-serif;
+  letter-spacing: 2px;
+  transition: border 0.2s;
+}
+.cb-modern-input:focus {
+  border: 2px solid #2563eb;
+}
+.cb-modern-input:disabled {
+  background: #e5e7eb;
+  color: #a1a1aa;
+}
+.cb-modern-btn {
+  padding: 0.6rem 1.5rem;
+  font-size: 1.1rem;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+  font-weight: 600;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px #e0e7ff;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.cb-modern-btn:disabled {
+  background: #a5b4fc;
+  cursor: not-allowed;
+}
+.cb-modern-btn:hover:not(:disabled) {
+  background: #1e40af;
+  box-shadow: 0 4px 16px #a5b4fc;
+}
+.cb-modern-message {
+  margin-bottom: 0.7rem;
+  font-weight: 600;
+  color: #2563eb;
+  text-align: center;
+  font-size: 1.1rem;
+  min-height: 1.5em;
+}
+.cb-modern-message-final {
+  color: #059669;
+  font-size: 1.18rem;
+  font-weight: 700;
+}
+
+/* Feedback highlight for guess history */
+.cb-modern-history-item.cb-success {
+  background: linear-gradient(90deg,#bbf7d0 0%,#f0fdfa 100%);
+  color: #059669;
+  font-weight: 700;
+  border-left: 5px solid #059669;
+}
+.cb-modern-history-item.cb-fail {
+  background: linear-gradient(90deg,#fee2e2 0%,#f0fdfa 100%);
+  color: #dc2626;
+  border-left: 5px solid #dc2626;
+}
+.cb-modern-history-item.cb-invalid {
+  background: linear-gradient(90deg,#fef9c3 0%,#f0fdfa 100%);
+  color: #b45309;
+  border-left: 5px solid #b45309;
+}
+}
+.cb-modern-attempts {
+  margin-bottom: 0.7rem;
+  font-size: 1.08rem;
+  color: #334155;
+}
+.cb-modern-history {
+  width: 100%;
+  max-width: 340px;
+  margin-bottom: 1rem;
+  padding: 0;
+  list-style: none;
+  background: #f1f5f9;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px #e0e7ff;
+}
+.cb-modern-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.5rem 0.7rem;
+  font-size: 1.05rem;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+}
+.cb-modern-history-item:last-child {
+  border-bottom: none;
+}
+.cb-modern-history-num {
+  color: #64748b;
+  font-size: 0.98rem;
+  margin-right: 0.7rem;
+}
+.cb-modern-history-guess {
+  font-family: 'Orbitron', 'Inter', Arial, Helvetica, sans-serif;
+  font-size: 1.13rem;
+  color: #1e293b;
+  margin-right: 0.7rem;
+}
+.cb-modern-history-feedback {
+  color: #2563eb;
+  font-size: 1.01rem;
+}
+.cb-modern-replay {
+  background: #059669;
+  margin-top: 0.5rem;
+}
+.cb-modern-replay:hover {
+  background: #047857;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -18,4 +186,91 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* --- Cows and Bulls Game Styles --- */
+.cb-container {
+  max-width: 400px;
+  margin: 40px auto;
+  background: rgba(255,255,255,0.95);
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cb-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  letter-spacing: 1px;
+}
+.cb-desc {
+  font-size: 1rem;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+.cb-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.cb-input {
+  width: 120px;
+  padding: 0.5rem;
+  font-size: 1.1rem;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  text-align: center;
+  outline: none;
+  background: #f8f8f8;
+}
+.cb-input:disabled {
+  background: #e5e5e5;
+}
+.cb-btn {
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.cb-btn:disabled {
+  background: #a5b4fc;
+  cursor: not-allowed;
+}
+.cb-message {
+  margin-bottom: 0.7rem;
+  font-weight: 600;
+  color: #2563eb;
+  text-align: center;
+}
+.cb-attempts {
+  margin-bottom: 0.7rem;
+  font-size: 1rem;
+}
+.cb-history {
+  width: 100%;
+  max-width: 320px;
+  margin-bottom: 1rem;
+  padding: 0;
+  list-style: none;
+}
+.cb-history-item {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 0.3rem 0;
+  font-size: 0.98rem;
+}
+.cb-replay {
+  background: #059669;
+  margin-top: 0.5rem;
+}
+.cb-replay:hover {
+  background: #047857;
 }

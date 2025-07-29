@@ -1,101 +1,198 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+
+// --- Cows and Bulls Game Logic ---
+
+// Generate a random 4-digit number with no repeating digits
+function generateSecretNumber(): string {
+  const digits = Array.from({ length: 10 }, (_, i) => i.toString());
+  let result = "";
+  while (result.length < 4) {
+    const idx = Math.floor(Math.random() * digits.length);
+    // First digit can't be zero
+    if (result.length === 0 && digits[idx] === "0") continue;
+    result += digits[idx];
+    digits.splice(idx, 1);
+  }
+  return result;
+}
+
+// Validate guess: must be 4 unique digits
+function validateGuess(guess: string): string | null {
+  if (!/^[0-9]{4}$/.test(guess)) return "Input must be a 4-digit number.";
+  if (new Set(guess).size !== 4) return "Digits must not repeat.";
+  return null;
+}
+
+// Calculate bulls (right digit, right place) and cows (right digit, wrong place)
+function getBullsAndCows(secret: string, guess: string): { bulls: number; cows: number } {
+  let bulls = 0, cows = 0;
+  for (let i = 0; i < 4; i++) {
+    if (guess[i] === secret[i]) bulls++;
+    else if (secret.includes(guess[i])) cows++;
+  }
+  return { bulls, cows };
+}
+
+import React, { useState } from "react";
+
+// --- Main Game Component ---
+export default function CowsAndBulls() {
+  // State variables
+  const [secret, setSecret] = useState(generateSecretNumber()); // Secret number
+  const [guess, setGuess] = useState(""); // Current guess
+  const [history, setHistory] = useState<{ guess: string; bulls: number; cows: number }[]>([]); // Guess history
+  const [attempts, setAttempts] = useState(0); // Attempt count
+  const [message, setMessage] = useState(""); // Feedback message
+  const [gameOver, setGameOver] = useState(false); // Game over flag
+  const [feedbackType, setFeedbackType] = useState<'none' | 'success' | 'fail' | 'invalid'>("none");
+
+  // Sound effects
+  function playSound(type: 'success' | 'fail' | 'invalid') {
+    let url = '';
+    if (type === 'success') url = 'https://cdn.pixabay.com/audio/2022/07/26/audio_124bfae6c2.mp3'; // win
+    if (type === 'fail') url = 'https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b7b7e.mp3'; // lose
+    if (type === 'invalid') url = 'https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b7b7e.mp3'; // error
+    if (url) {
+      const audio = new Audio(url);
+      audio.volume = 0.25;
+      audio.play();
+    }
+  }
+
+  // Handle guess submission
+  function handleGuess(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (gameOver) return;
+    const error = validateGuess(guess);
+    if (error) {
+      setMessage(error);
+      setFeedbackType('invalid');
+      playSound('invalid');
+      return;
+    }
+    const { bulls, cows } = getBullsAndCows(secret, guess);
+    const newHistory = [...history, { guess, bulls, cows }];
+    setHistory(newHistory);
+    setAttempts(attempts + 1);
+    setMessage(`${bulls} bulls, ${cows} cows`);
+    setGuess("");
+    if (bulls === 4) {
+      setGameOver(true);
+      setMessage("Congratulations! You guessed the number! 🎉");
+      setFeedbackType('success');
+      playSound('success');
+    } else if (attempts + 1 >= 10) {
+      setGameOver(true);
+      setMessage(`Game over! The number was ${secret}.`);
+      setFeedbackType('fail');
+      playSound('fail');
+    } else {
+      setFeedbackType('fail');
+      playSound('fail');
+    }
+  }
+
+  // Handle replay (reset game)
+  function handleReplay() {
+    setSecret(generateSecretNumber());
+    setGuess("");
+    setHistory([]);
+    setAttempts(0);
+    setMessage("");
+    setGameOver(false);
+    setFeedbackType('none');
+  }
+
+  // --- UI ---
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+    <>
+      {/* Google Fonts are loaded in _document.js for best practice */}
+      <div className="cb-modern-bg">
+        <div className="cb-modern-container">
+          <h1 className="cb-modern-title">Cows &amp; Bulls</h1>
+          <p className="cb-modern-desc">
+            <span>Guess the <b>secret 4-digit number</b>.<br /></span>
+            <span>No repeating digits.<br /></span>
+            <span>After each guess, you&apos;ll get feedback in the form of <b>bulls</b> (correct digit, correct place) and <b>cows</b> (correct digit, wrong place).<br /></span>
+            <span>You have <b>10 attempts</b>!</span>
+          </p>
+          <form onSubmit={handleGuess} className="cb-modern-form">
+            <input
+              type="text"
+              value={guess}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGuess(e.target.value)}
+              maxLength={4}
+              disabled={gameOver}
+              className="cb-modern-input"
+              placeholder="Enter 4 digits"
+              inputMode="numeric"
+              pattern="[0-9]{4}"
+              autoFocus
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <button
+              type="submit"
+              disabled={gameOver}
+              className="cb-modern-btn"
+            >
+              Guess
+            </button>
+          </form>
+          {message && (
+            <div
+              className={`cb-modern-message${gameOver ? ' cb-modern-message-final' : ''}`}
+              style={{
+                background:
+                  feedbackType === 'success' ? 'linear-gradient(90deg,#bbf7d0 0%,#f0fdfa 100%)' :
+                  feedbackType === 'fail' ? 'linear-gradient(90deg,#fee2e2 0%,#f0fdfa 100%)' :
+                  feedbackType === 'invalid' ? 'linear-gradient(90deg,#fef9c3 0%,#f0fdfa 100%)' :
+                  'none',
+                color:
+                  feedbackType === 'success' ? '#059669' :
+                  feedbackType === 'fail' ? '#dc2626' :
+                  feedbackType === 'invalid' ? '#b45309' :
+                  undefined,
+                borderRadius: '8px',
+                padding: '0.5em 0.7em',
+                marginBottom: '0.7rem',
+                fontWeight: 700,
+                boxShadow: feedbackType !== 'none' ? '0 2px 8px #e0e7ff' : undefined,
+                transition: 'all 0.2s',
+              }}
+            >
+              {message}
+            </div>
+          )}
+          <div className="cb-modern-attempts">Attempts: <b>{attempts}</b> / 10</div>
+          <ul className="cb-modern-history">
+            {history.map((h, i) => {
+              let rowClass = "cb-modern-history-item";
+              if (i === history.length - 1) {
+                if (feedbackType === 'success') rowClass += ' cb-success';
+                else if (feedbackType === 'fail') rowClass += ' cb-fail';
+                else if (feedbackType === 'invalid') rowClass += ' cb-invalid';
+              }
+              return (
+                <li key={i} className={rowClass}>
+                  <span className="cb-modern-history-num">#{i + 1}</span>
+                  <span className="cb-modern-history-guess">{h.guess}</span>
+                  <span className="cb-modern-history-feedback">
+                    {h.bulls} bulls, {h.cows} cows
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+          {gameOver && (
+            <button
+              onClick={handleReplay}
+              className="cb-modern-btn cb-modern-replay"
+            >
+              Play Again
+            </button>
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </>
   );
 }
